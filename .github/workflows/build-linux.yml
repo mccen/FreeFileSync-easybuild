@@ -29,7 +29,6 @@ jobs:
             libcurl4-openssl-dev \
             libboost-all-dev \
             libgtk2.0-dev \
-            libgtk-3-dev \
             libglib2.0-dev \
             libsm-dev \
             zlib1g-dev
@@ -41,16 +40,20 @@ jobs:
           cd wxWidgets-3.3.1
           mkdir build-gtk
           cd build-gtk
-          # 关键：GTK2 + 禁用 shared + 禁用 wx 自己的异常处理
           ../configure --disable-shared --disable-exceptions --with-gtk=2
           make -j"$(nproc)"
           sudo make install
           sudo ldconfig
 
+      - name: Patch FreeFileSync sources (disable aggressive DPI check)
+        working-directory: FreeFileSync/Source
+        run: |
+          # 在 wx+/dc.h 里强行定义 wxHAS_DPI_INDEPENDENT_PIXELS，绕过 #error
+          sed -i 's/#include <wx\/dcscreen.h>/#include <wx\/dcscreen.h>\n#define wxHAS_DPI_INDEPENDENT_PIXELS 1/' wx+/dc.h
+
       - name: Build FreeFileSync
         working-directory: FreeFileSync/Source
         env:
-          # 关键：用 g++-12，而不是系统默认的 g++
           CXX: g++-12
         run: |
           make -j"$(nproc)"
