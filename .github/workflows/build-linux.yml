@@ -46,10 +46,9 @@ jobs:
           sudo ldconfig
 
       - name: Patch FreeFileSync sources (disable aggressive DPI check)
-        working-directory: FreeFileSync/Source
         run: |
           # 在 wx+/dc.h 里强行定义 wxHAS_DPI_INDEPENDENT_PIXELS，绕过 #error
-          sudo sed -i 's/#include <wx\/dcscreen.h>/#include <wx\/dcscreen.h>\n#define wxHAS_DPI_INDEPENDENT_PIXELS 1/' /usr/local/include/wx-3.3/wx/dc.h
+          sed -i 's/#include <wx\/dcscreen.h>/#include <wx\/dcscreen.h>\n#define wxHAS_DPI_INDEPENDENT_PIXELS 1/' wx+/dc.h
 
       - name: Build FreeFileSync
         working-directory: FreeFileSync/Source
